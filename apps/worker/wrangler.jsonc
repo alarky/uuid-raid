@@ -3,6 +3,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-03-21",
 
+  "routes": [
+    { "pattern": "uuid-raid.alarky.dev", "custom_domain": true }
+  ],
+
   "assets": {
     "directory": "../web/dist",
     "binding": "ASSETS",
