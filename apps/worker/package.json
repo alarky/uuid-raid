@@ -1,0 +1,20 @@
+{
+  "name": "@uuid-raid/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --var DEV_MODE:true",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .wrangler/state",
+    "seed": "curl -s -X POST http://localhost:8787/seed?count=${COUNT:-1000} && echo"
+  },
+  "dependencies": {
+    "@uuid-raid/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250320.0",
+    "wrangler": "^4.0.0"
+  }
+}

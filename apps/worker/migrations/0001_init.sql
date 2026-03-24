@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS uuids (
+  uuid TEXT PRIMARY KEY,
+  player_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS quota (
+  month TEXT PRIMARY KEY,
+  used INTEGER DEFAULT 0,
+  limit_amount INTEGER DEFAULT 3000000
+);
+
+CREATE TABLE IF NOT EXISTS stats (
+  key TEXT PRIMARY KEY,
+  value TEXT
+);

@@ -1,0 +1,430 @@
+/* CRT Effect */
+.crt {
+  position: relative;
+}
+
+.crt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+.crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Base styles */
+.app {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  font-size: 10px;
+  line-height: 1.8;
+  overflow: hidden;
+}
+
+/* Glow effect for text */
+.glow {
+  text-shadow: 0 0 5px #00ff41, 0 0 10px #00ff41, 0 0 20px #00ff41;
+}
+
+.glow-red {
+  color: #ff0040;
+  text-shadow: 0 0 5px #ff0040, 0 0 10px #ff0040;
+}
+
+.glow-yellow {
+  color: #ffff00;
+  text-shadow: 0 0 5px #ffff00, 0 0 10px #ffff00;
+}
+
+.glow-cyan {
+  color: #00ffff;
+  text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+}
+
+/* Title screen */
+.title {
+  font-size: 24px;
+  letter-spacing: 4px;
+  margin-bottom: 40px;
+  animation: flicker 3s infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.8; }
+  94% { opacity: 1; }
+  96% { opacity: 0.9; }
+  97% { opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Name input */
+.name-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #00ff41;
+  color: #00ff41;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 16px;
+  padding: 8px 4px;
+  text-align: center;
+  letter-spacing: 4px;
+  width: 100%;
+  max-width: 400px;
+  outline: none;
+  caret-color: #00ff41;
+}
+
+.name-input::placeholder {
+  color: #333;
+  letter-spacing: 4px;
+}
+
+/* Raid room */
+.raid-container {
+  width: 100%;
+  max-width: 500px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* === The Wall === */
+.wall-container {
+  border: 1px solid #333;
+  padding: 20px 16px;
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 20;
+  background: #0a0a0a;
+}
+
+.wall-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.wall-alive {
+  font-size: 8px;
+  color: #666;
+}
+
+.wall-record {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wall-progress {
+  font-size: 8px;
+  color: #666;
+  text-align: right;
+  line-height: 1.4;
+}
+
+.wall-gauge-track {
+  position: relative;
+  height: 24px;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  overflow: hidden;
+}
+
+.wall-gauge-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #ff0040;
+  box-shadow: 0 0 12px rgba(255, 0, 64, 0.4);
+  transition: width 0.5s ease-out;
+}
+
+.wall-gauge-hit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  opacity: 0.5;
+  animation: hit-fade 800ms ease-out forwards;
+}
+
+/* Battle area (bullet rain + hit overlay) */
+.battle-area {
+  flex: 1;
+  min-height: 80px;
+  position: relative;
+  border: 1px solid #333;
+  border-top: none;
+}
+
+/* Hit overlay */
+.hit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  text-align: center;
+  animation: hit-fade 800ms ease-out forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hit-uuids {
+  font-size: 11px;
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+.hit-matched {
+  text-shadow: 0 0 8px currentColor, 0 0 20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+.hit-unmatched {
+  color: #333;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+.hit-label {
+  margin-top: 8px;
+  font-size: 8px;
+  font-family: 'Press Start 2P', monospace;
+  text-shadow: 0 0 6px currentColor, 0 0 20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+/* === Bullet Rain === */
+.bullet-rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.bullet {
+  position: absolute;
+  bottom: 0;
+  font-size: 8px;
+  font-family: 'Press Start 2P', monospace;
+  animation: bullet-fly 0.6s linear both;
+  writing-mode: vertical-rl;
+  pointer-events: none;
+  letter-spacing: 2px;
+}
+
+
+/* Stats panel */
+.stats-panel {
+  padding: 10px 12px;
+  border: 1px solid #333;
+  border-top: none;
+  font-size: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn {
+  background: transparent;
+  border: 2px solid #00ff41;
+  color: #00ff41;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  background: #00ff41;
+  color: #0a0a0a;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn.active {
+  background: #00ff41;
+  color: #0a0a0a;
+}
+
+.btn-red {
+  border-color: #ff0040;
+  color: #ff0040;
+}
+
+.btn-red:hover,
+.btn-red.active {
+  background: #ff0040;
+  color: #0a0a0a;
+}
+
+
+/* High scores */
+.high-scores-table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+
+.high-scores-table td {
+  padding: 6px 12px;
+  text-align: left;
+}
+
+/* Record claim modal */
+.record-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fadeIn 0.3s;
+}
+
+.record-modal-inner {
+  text-align: center;
+  padding: 32px;
+  max-width: 90vw;
+  border: 2px solid #ffff00;
+  background: #0a0a0a;
+  box-shadow: 0 0 30px rgba(255, 255, 0, 0.3);
+}
+
+.bullet-glow-pulse {
+  animation: bullet-fly 1.2s linear both, glow-pulse 0.06s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+  0% {
+    text-shadow: 0 0 var(--glow-size) var(--glow-color), 0 0 calc(var(--glow-size) * 2) var(--glow-color);
+  }
+  100% {
+    text-shadow: 0 0 calc(var(--glow-size) * 2.5) var(--glow-color), 0 0 calc(var(--glow-size) * 4) var(--glow-color), 0 0 calc(var(--glow-size) * 6) var(--glow-color);
+  }
+}
+
+/* === Animations === */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+@keyframes hit-fade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
+@keyframes bullet-fly {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-95vh);
+    opacity: 0;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .app {
+    padding: 4px;
+    font-size: 8px;
+  }
+
+  .wall-label {
+    font-size: 8px;
+  }
+
+  .wall-progress {
+    font-size: 6px;
+  }
+
+  .hit-uuids {
+    font-size: 7px;
+    letter-spacing: 0;
+  }
+
+  .hit-label {
+    font-size: 6px;
+  }
+
+  .stats-panel {
+    font-size: 6px;
+    padding: 6px;
+  }
+
+  .btn {
+    font-size: 8px;
+    padding: 8px 12px;
+  }
+
+  .name-input {
+    font-size: 12px;
+  }
+
+  .record-modal-inner {
+    padding: 16px;
+    margin: 8px;
+  }
+}

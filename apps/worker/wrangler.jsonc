@@ -1,0 +1,21 @@
+{
+  "name": "uuid-raid",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-21",
+
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RAID_ROOM",
+        "class_name": "RaidRoom"
+      }
+    ]
+  },
+
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": ["RaidRoom"]
+    }
+  ]
+}
