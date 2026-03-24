@@ -1,99 +1,103 @@
-# UUID Raid - 概要
+# UUID Raid
 
-## コンセプト
+"Can UUIDs collide?" - Multiplayer UUID v7 collision raid game.
 
-「UUIDは衝突するのか？」を体感するマルチプレイヤーWebゲーム。
-レトロアーケード風。Web/CLIどちらからでもプレイ可能。
+## Concept
 
-ボス「ENTROPY」(HP: ∞) をみんなで殴り続ける。UUID生成はサーバー側（チート不可）。
+Boss "ENTROPY UUIDv7" has infinite HP. Players fire UUID v7s and find the longest matching random bit prefix. Retro arcade style, browser-based.
 
-## アーキテクチャ
+Server generates all UUIDs with `crypto.getRandomValues()` (cheat-proof). Pool of up to 10,000 UUIDs is maintained for comparison. Birthday paradox makes matches more likely with more players.
+
+## Architecture
 
 ```
-                    ┌─────────────┐
-                    │  Cloudflare  │
-  Browser ──ws──→  │   Workers    │ ──→ D1 (v4 UUIDs + quota)
-  CLI ─────ws──→   │  ┌────────┐ │
-                    │  │RaidRoom│ │ ──→ DO Storage (歴代記録)
-                    │  │  (DO)  │ │
-                    │  └────────┘ │
-                    └─────────────┘
+                    +---------------+
+  Browser --ws-->   | Cloudflare    |
+                    | Workers       |
+                    | +----------+  |
+                    | | RaidRoom |  | --> DO Storage (records, high scores)
+                    | |   (DO)   |  |
+                    | +----------+  |
+                    +---------------+
 ```
 
-## パッケージ構成
+## Package Structure
 
-| コンポーネント | パッケージ名 | 技術 |
+| Package | Name | Tech |
 |---|---|---|
-| `packages/shared` | `@uuid-raid/shared` | TypeScript (プロトコル型 + ダメージ計算) |
-| `apps/worker` | `@uuid-raid/worker` | Cloudflare Workers + Durable Objects + D1 |
+| `packages/shared` | `@uuid-raid/shared` | TypeScript (protocol types + damage calc) |
+| `apps/worker` | `@uuid-raid/worker` | Cloudflare Workers + Durable Objects |
 | `apps/web` | `@uuid-raid/web` | React 19 + Vite 6 |
-| `apps/cli` | `uuid-raid` | Node.js + ws + readline |
 
-## ディレクトリ構造
+## Directory Structure
 
 ```
 uuid-raid/
-├── pnpm-workspace.yaml
-├── package.json
-├── tsconfig.base.json
 ├── packages/
-│   └── shared/                # @uuid-raid/shared
+│   └── shared/
 │       └── src/
 │           ├── index.ts
 │           ├── protocol.ts    # WebSocket message types
-│           └── damage.ts      # ダメージ計算
+│           └── damage.ts      # Hit levels + bit matching
 ├── apps/
-│   ├── worker/                # Cloudflare Workers
+│   ├── worker/
 │   │   ├── wrangler.jsonc
-│   │   ├── migrations/
-│   │   │   └── 0001_init.sql
 │   │   └── src/
-│   │       ├── index.ts       # HTTP router + DO/D1 binding
-│   │       ├── raid-room.ts   # RaidRoom DO
-│   │       ├── v4-store.ts    # D1操作
-│   │       ├── quota.ts       # quota管理
-│   │       └── verify.ts      # UUID検証
-│   ├── web/                   # ブラウザ版
-│   │   ├── index.html
-│   │   ├── vite.config.ts
-│   │   └── src/
-│   │       ├── main.tsx
-│   │       ├── App.tsx
-│   │       ├── styles.css
-│   │       ├── hooks/
-│   │       │   ├── useWebSocket.ts
-│   │       │   └── useRaidRoom.ts
-│   │       └── components/
-│   │           ├── TitleScreen.tsx
-│   │           ├── NameInput.tsx
-│   │           ├── RaidRoom.tsx
-│   │           ├── BossDisplay.tsx
-│   │           ├── DamageFeed.tsx
-│   │           ├── AttackStats.tsx
-│   │           ├── QuotaBar.tsx
-│   │           ├── PlayerList.tsx
-│   │           └── HighScores.tsx
-│   └── cli/                   # CLI版
+│   │       ├── index.ts       # HTTP router + DO binding
+│   │       └── raid-room.ts   # RaidRoom Durable Object
+│   └── web/
+│       ├── index.html
+│       ├── vite.config.ts
 │       └── src/
-│           ├── index.ts
-│           ├── ws.ts
-│           └── ui.ts
-└── docs/                      # ← このドキュメント群
+│           ├── main.tsx
+│           ├── App.tsx
+│           ├── styles.css
+│           ├── hooks/
+│           │   ├── useWebSocket.ts
+│           │   └── useRaidRoom.ts
+│           └── components/
+│               ├── TitleScreen.tsx
+│               ├── NameInput.tsx
+│               ├── RaidRoom.tsx
+│               ├── Wall.tsx
+│               ├── HitOverlay.tsx
+│               ├── BulletRain.tsx
+│               └── AttackStats.tsx
+└── docs/
 ```
 
-## 2つのゲームモード
+## Game Mechanics
 
-### v7 リアルタイムレイド（無料、メモリのみ）
+- Server generates UUID v7 random parts (74 bits = rand_a 12 + rand_b 62)
+- UUIDs are pooled (up to 10,000) and compared on insert against existing pool
+- Each second, the best match from newly inserted UUIDs is broadcast
+- Hit levels: dim (<10), normal (10+), good (14+), great (20+), amazing (25+), legendary (30+)
+- Bullets are colored and sized by hit level; rare hits glow and move slower
+- 74-bit full match = game clear (timer stops, attacks cease)
 
-- サーバーが `crypto.getRandomValues()` で UUID v7 のランダム部分 (74bit) を生成
-- poolに蓄積 → 1秒ごとにソート → 隣接比較で最長一致検出 → broadcast → poolクリア
-- Birthday Attack: 2^37 (≈1370億) → 倒せないが部分一致は出る
-- 同時接続人数 = pool大 = Birthday Paradox = レイドの意味
-- メモリのみ、ストレージ不要 → コスト $0
+## Quick Start
 
-### v4 耐久チャレンジ（donate課金）
+```bash
+pnpm install
+pnpm --filter @uuid-raid/shared build
 
-- サーバーが `crypto.randomUUID()` で生成 → D1にINSERT → 衝突チェック
-- 全UUID永続保存 → グローバルで衝突しない証明
-- Birthday Attack: 2^61 → 究極の壁
-- 月間quota制（全プレイヤー共有）→ donateで拡張
+# Terminal 1: Worker
+pnpm dev:worker
+
+# Terminal 2: Web
+pnpm dev:web
+```
+
+## Dev Tools
+
+```bash
+# Clear local storage
+pnpm --filter @uuid-raid/worker clean
+
+# Seed pool with UUIDs (dev only)
+COUNT=10000 pnpm --filter @uuid-raid/worker seed
+```
+
+## License
+
+MIT
