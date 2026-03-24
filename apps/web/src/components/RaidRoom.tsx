@@ -65,6 +65,12 @@ export function RaidRoom() {
         onStopTurbo={stopTurbo}
       />
 
+      <div className="footer">
+        <a href="https://github.com/alarky/uuid-raid" target="_blank" rel="noopener noreferrer">
+          github.com/alarky/uuid-raid
+        </a>
+      </div>
+
       {state.pendingRecord && (
         <div className="record-modal">
           <div className="record-modal-inner">
