@@ -297,9 +297,11 @@
   transition: all 0.15s;
 }
 
-.btn:hover {
-  background: #00ff41;
-  color: #0a0a0a;
+@media (hover: hover) {
+  .btn:hover {
+    background: #00ff41;
+    color: #0a0a0a;
+  }
 }
 
 .btn:active {
@@ -316,10 +318,16 @@
   color: #ff0040;
 }
 
-.btn-red:hover,
 .btn-red.active {
   background: #ff0040;
   color: #0a0a0a;
+}
+
+@media (hover: hover) {
+  .btn-red:hover {
+    background: #ff0040;
+    color: #0a0a0a;
+  }
 }
 
 
