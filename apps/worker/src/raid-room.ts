@@ -101,6 +101,7 @@ export class RaidRoom implements DurableObject {
           v7AllTimeBest: this.v7AllTimeBest,
           v7AllTimeBestPlayer: this.v7AllTimeBestPlayer,
           playerCount: this.sessions.size,
+          poolSize: this.v7Pool.length,
         }),
         { headers: { "Content-Type": "application/json" } }
       );
@@ -253,6 +254,7 @@ export class RaidRoom implements DurableObject {
         };
       }
     }
+    this.v7TotalChecked += count;
     this.sendTo(ws, { type: "v7_fired", entries });
   }
 
@@ -317,8 +319,6 @@ export class RaidRoom implements DurableObject {
     if (this.v7Pool.length > MAX_POOL_SIZE) {
       this.v7Pool = this.v7Pool.slice(this.v7Pool.length - MAX_POOL_SIZE);
     }
-
-    this.v7TotalChecked += this.v7Pool.length;
 
     // Broadcast round best (accumulated from v7_fired comparisons)
     if (this.roundBest) {
