@@ -295,6 +295,10 @@
   padding: 12px 24px;
   cursor: pointer;
   transition: all 0.15s;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 @media (hover: hover) {
